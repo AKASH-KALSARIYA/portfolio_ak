@@ -209,4 +209,330 @@ function showNotification(message, type = 'info') {
             setTimeout(() => notification.remove(), 300);
         }
     }, 5000);
-} 
+}
+
+// Mobile Device Detection and Responsive Optimizations
+document.addEventListener('DOMContentLoaded', function() {
+    
+    // Mobile device detection
+    function isMobileDevice() {
+        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+               window.innerWidth <= 768;
+    }
+    
+    // Touch device detection
+    function isTouchDevice() {
+        return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    }
+    
+    // Apply mobile-specific optimizations
+    function applyMobileOptimizations() {
+        const body = document.body;
+        const navbar = document.querySelector('.navbar');
+        const heroSection = document.querySelector('.hero');
+        const skillCards = document.querySelectorAll('.skill-card');
+        const projectCards = document.querySelectorAll('.project-card');
+        const buttons = document.querySelectorAll('.btn');
+        const navLinks = document.querySelectorAll('.nav-link');
+        
+        if (isMobileDevice()) {
+            // Add mobile class to body
+            body.classList.add('mobile-device');
+            
+            // Mobile navbar optimizations
+            if (navbar) {
+                navbar.classList.add('mobile-navbar');
+            }
+            
+            // Mobile hero optimizations
+            if (heroSection) {
+                heroSection.classList.add('mobile-hero');
+            }
+            
+            // Mobile skill cards
+            skillCards.forEach(card => {
+                card.classList.add('mobile-skill-card');
+            });
+            
+            // Mobile project cards
+            projectCards.forEach(card => {
+                card.classList.add('mobile-project-card');
+            });
+            
+            // Mobile button optimizations
+            buttons.forEach(btn => {
+                btn.classList.add('mobile-btn');
+            });
+            
+            // Mobile navigation optimizations
+            navLinks.forEach(link => {
+                link.classList.add('mobile-nav-link');
+            });
+            
+            // Add touch-friendly hover effects
+            if (isTouchDevice()) {
+                addTouchInteractions();
+            }
+            
+            console.log('Mobile optimizations applied');
+        } else {
+            // Remove mobile classes for desktop
+            body.classList.remove('mobile-device');
+            navbar?.classList.remove('mobile-navbar');
+            heroSection?.classList.remove('mobile-hero');
+            
+            skillCards.forEach(card => card.classList.remove('mobile-skill-card'));
+            projectCards.forEach(card => card.classList.remove('mobile-project-card'));
+            buttons.forEach(btn => btn.classList.remove('mobile-btn'));
+            navLinks.forEach(link => link.classList.remove('mobile-nav-link'));
+            
+            console.log('Desktop optimizations applied');
+        }
+    }
+    
+    // Add touch interactions for mobile
+    function addTouchInteractions() {
+        const interactiveElements = document.querySelectorAll('.skill-card, .project-card, .btn, .nav-link');
+        
+        interactiveElements.forEach(element => {
+            element.addEventListener('touchstart', function() {
+                this.style.transform = 'scale(0.95)';
+            });
+            
+            element.addEventListener('touchend', function() {
+                this.style.transform = 'scale(1)';
+            });
+        });
+    }
+    
+    // Handle orientation changes
+    function handleOrientationChange() {
+        setTimeout(() => {
+            applyMobileOptimizations();
+        }, 100);
+    }
+    
+    // Handle window resize
+    function handleResize() {
+        applyMobileOptimizations();
+    }
+    
+    // Initialize mobile optimizations
+    applyMobileOptimizations();
+    
+    // Event listeners
+    window.addEventListener('resize', handleResize);
+    window.addEventListener('orientationchange', handleOrientationChange);
+    
+    // Smooth scrolling for mobile
+    const navLinks = document.querySelectorAll('.nav-link');
+    navLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href');
+            const targetSection = document.querySelector(targetId);
+            
+            if (targetSection) {
+                const offsetTop = targetSection.offsetTop - 70; // Account for navbar
+                window.scrollTo({
+                    top: offsetTop,
+                    behavior: 'smooth'
+                });
+            }
+        });
+    });
+    
+    // Mobile menu toggle (if needed for smaller screens)
+    function createMobileMenu() {
+        const navbar = document.querySelector('.navbar');
+        const navMenu = document.querySelector('.nav-menu');
+        
+        if (navbar && navMenu && window.innerWidth <= 600) {
+            // Create hamburger menu
+            const hamburger = document.createElement('div');
+            hamburger.className = 'mobile-menu-toggle';
+            hamburger.innerHTML = '<span></span><span></span><span></span>';
+            
+            // Add mobile menu styles
+            const style = document.createElement('style');
+            style.textContent = `
+                .mobile-menu-toggle {
+                    display: none;
+                    flex-direction: column;
+                    cursor: pointer;
+                    padding: 10px;
+                }
+                
+                .mobile-menu-toggle span {
+                    width: 25px;
+                    height: 3px;
+                    background: #10B981;
+                    margin: 3px 0;
+                    transition: 0.3s;
+                }
+                
+                @media (max-width: 600px) {
+                    .mobile-menu-toggle {
+                        display: flex;
+                    }
+                    
+                    .nav-menu {
+                        position: fixed;
+                        top: 70px;
+                        left: -100%;
+                        width: 100%;
+                        height: calc(100vh - 70px);
+                        background: rgba(255,255,255,0.95);
+                        backdrop-filter: blur(12px);
+                        flex-direction: column;
+                        justify-content: flex-start;
+                        align-items: center;
+                        padding-top: 2rem;
+                        transition: left 0.3s ease;
+                        z-index: 999;
+                    }
+                    
+                    .nav-menu.active {
+                        left: 0;
+                    }
+                    
+                    .nav-menu li {
+                        margin: 1rem 0;
+                    }
+                    
+                    .nav-link {
+                        font-size: 1.2rem;
+                        padding: 1rem 2rem;
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            // Insert hamburger before nav menu
+            navbar.querySelector('.nav-container').insertBefore(hamburger, navMenu);
+            
+            // Toggle menu
+            hamburger.addEventListener('click', function() {
+                navMenu.classList.toggle('active');
+                this.classList.toggle('active');
+            });
+            
+            // Close menu when clicking on a link
+            navLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    navMenu.classList.remove('active');
+                    hamburger.classList.remove('active');
+                });
+            });
+        }
+    }
+    
+    // Initialize mobile menu
+    createMobileMenu();
+    
+    // Recreate mobile menu on resize
+    window.addEventListener('resize', function() {
+        setTimeout(createMobileMenu, 100);
+    });
+    
+    // Add mobile-specific CSS classes
+    const mobileStyles = document.createElement('style');
+    mobileStyles.textContent = `
+        .mobile-device .hero-container {
+            flex-direction: column;
+            text-align: center;
+            gap: 1.5rem;
+        }
+        
+        .mobile-device .hero-photo img {
+            width: 150px;
+            height: 150px;
+        }
+        
+        .mobile-device .about-card {
+            flex-direction: column;
+            text-align: center;
+            gap: 1rem;
+        }
+        
+        .mobile-device .skills-three-cols {
+            grid-template-columns: 1fr;
+            gap: 0.8rem;
+        }
+        
+        .mobile-device .projects-grid {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+        
+        .mobile-device .contact-container {
+            flex-direction: column;
+            text-align: center;
+            gap: 1.5rem;
+        }
+        
+        .mobile-device .footer-grid {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+            text-align: center;
+        }
+        
+        .mobile-skill-card {
+            min-height: 80px;
+            padding: 1rem 0.5rem;
+        }
+        
+        .mobile-project-card {
+            min-height: 180px;
+        }
+        
+        .mobile-btn {
+            min-height: 44px;
+            min-width: 44px;
+            font-size: 1rem;
+            padding: 12px 24px;
+        }
+        
+        .mobile-nav-link {
+            min-height: 44px;
+            min-width: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+        
+        /* Mobile-specific animations */
+        .mobile-device .skill-card:hover {
+            transform: scale(1.02);
+        }
+        
+        .mobile-device .project-card:hover {
+            transform: scale(1.02);
+        }
+        
+        /* Mobile scroll behavior */
+        .mobile-device {
+            scroll-behavior: smooth;
+        }
+        
+        /* Mobile touch feedback */
+        .mobile-device .btn:active,
+        .mobile-device .nav-link:active,
+        .mobile-device .skill-card:active,
+        .mobile-device .project-card:active {
+            transform: scale(0.95);
+            transition: transform 0.1s;
+        }
+    `;
+    document.head.appendChild(mobileStyles);
+    
+    // Performance optimization: Debounce resize events
+    let resizeTimeout;
+    window.addEventListener('resize', function() {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(handleResize, 250);
+    });
+    
+    console.log('Mobile detection and optimizations loaded');
+}); 
